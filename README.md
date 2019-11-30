@@ -1,4 +1,4 @@
-#Episode (ep)
+# Episode (ep)
 Remembers the last video you watched in the directory.
 Enumerates all videos in the directory and allows to refrence them only by a number.
 
