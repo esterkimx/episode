@@ -2,14 +2,14 @@ require 'json'
 
 DEFAULT_CFG = {
   viewer: 'mpv',
-  index_zero: false
+  index_from_zero: false
 }
 
 class Config
   attr_accessor :last
   attr_accessor :last_played_at
   attr_writer :viewer
-  attr_writer :index_zero
+  attr_writer :index_from_zero
 
   def self.load(io)
     new JSON.parse(io.read, symbolize_names: true)
@@ -20,7 +20,7 @@ class Config
     @last = cfg[:last]
     @last_played_at = cfg[:last_played_at]
     @viewer = cfg[:viewer]
-    @index_zero = cfg[:index_zero]
+    @index_from_zero = cfg[:index_from_zero]
   end
 
   def save(io)
@@ -34,7 +34,7 @@ class Config
         last: @last,
         last_played_at: @last_played_at,
         viewer: @viewer,
-        index_zero: @index_zero
+        index_from_zero: @index_from_zero
       }.compact
     else
       { 
@@ -42,7 +42,7 @@ class Config
         last: last,
         last_played_at: last_played_at,
         viewer: viewer,
-        index_zero: index_zero
+        index_from_zero: index_from_zero
       }
     end
   end
@@ -55,7 +55,7 @@ class Config
     @viewer || DEFAULT_CFG[:viewer]
   end
 
-  def index_zero
-    @index_zero || DEFAULT_CFG[:index_zero]
+  def index_from_zero
+    @index_from_zero || DEFAULT_CFG[:index_from_zero]
   end
 end

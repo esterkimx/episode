@@ -4,7 +4,7 @@ require 'optparse'
 require_relative 'main'
 
 PROGRAM_NAME = File.basename($PROGRAM_NAME)
-DATA_FILENAME = '.episode'
+CFG_FILENAME = '.episode'
 
 options = {}
 opt_parser = 
@@ -12,17 +12,18 @@ opt_parser =
     opts.program_name = PROGRAM_NAME
     opts.version = '0.1'
     opts.banner = <<~EOS
-    Usage: #{PROGRAM_NAME} <command> [arguments] [options]
+    Usage: #{PROGRAM_NAME} <command> [options]
 
       Commands:
-        last              Re-play episode watched last time 
-        next              Play next episode
-        prev              Play previous episode (one before 'last') 
-        no                Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
-        reset             Forget about the last episode
-        cfg               Print current config
-        set               Change config parameter
-        ls                List all episodes
+        last                  Re-play episode watched last time 
+        next                  Play next episode
+        prev                  Play previous episode (one before 'last') 
+        <number>              Same as `#{PROGRAM_NAME} no <number>` (i.e. `#{PROGRAM_NAME} 11`)
+        no                    Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
+        cfg                   Print config for current directory
+        reset [param]         Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
+        set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
+        ls                    List all episodes
 
       Options for last, next, prev, and num:
     EOS
@@ -37,13 +38,21 @@ opt_parser =
   end
 opt_parser.parse!
 
-unless command = ARGV[0] 
+unless ARGV[0] 
   $stderr.puts opt_parser.help
   return
 end
 
-begin
-  Main.new(options).send(command, *ARGV[1..])
+if ARGV[0] =~ /^\d+$/
+  command = 'no'
+  args = [ARGV[0]]
+else
+  command = ARGV[0]
+  args = ARGV[1..]
+end
+
+begin    
+  Main.new(options).send(command, *args)
 rescue NoCommandError => e
   $stderr.puts <<~EOS
     Error: Unknown command '#{e.message}'. 

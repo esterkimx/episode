@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'time'
+require 'readline'
 require_relative 'config'
 
 class NoCommandError < StandardError; end
@@ -7,8 +8,8 @@ class CommandError < StandardError; end
 
 class Main
   def initialize(opts) 
-    @name = opts[:name] || false
-    @update = opts[:update] != false
+    @is_name = opts[:name] || false
+    @is_update = opts[:update] != false
   end
 
   def last
@@ -44,7 +45,20 @@ class Main
     play
   end
 
-  def reset(param)
+  def cfg
+    config.to_h.each do |k, v|
+      puts "#{k}: #{v}"
+    end
+  end
+
+  def reset(param = nil)
+    if param.nil?
+      if "y" == Readline.readline('Reset all config parameters? (y|N) ').strip
+        FileUtils.rm_f(CFG_FILENAME)
+      end
+      return
+    end
+
     unless config.respond_to? param
       raise CommandError, <<~EOS
         Unknown config parameter '#{param}'".
@@ -54,12 +68,6 @@ class Main
 
     config.send("#{param}=", nil)
     save_config
-  end
-
-  def cfg
-    config.to_h.each do |k, v|
-      puts "#{k}: #{v}"
-    end
   end
 
   def set(param, value)
@@ -73,14 +81,14 @@ class Main
     case param
     when "last"
       config.last = parse_episode_ref(value)
-    when "index_zero"
+    when "index_from_zero"
       unless %w[true false].include? value
         raise CommandError, <<~EOS
-          Invalid value '#{value}' for 'index_zero'.
+          Invalid value '#{value}' for 'index_from_zero'.
           Should be true or false.
         EOS
       end
-      config.index_zero = (value == "true")
+      config.index_from_zero = (value == "true")
     when "last_played_at"
       config.last_played_at = 
         begin
@@ -99,7 +107,7 @@ class Main
 
   def ls
     episodes.each_with_index do |filename, id|
-      puts "#{config.index_zero ? id : id + 1} | #{filename}"
+      puts "#{config.index_from_zero ? id : id + 1} | #{filename}"
     end
   end
 
@@ -110,24 +118,24 @@ class Main
   end
 
   def name?
-    @name
+    @is_name
   end
 
   def update?
-    @update
+    @is_update
   end
 
   def config
     @config ||= 
-      if File.exists? DATA_FILENAME
-        File.open(DATA_FILENAME, 'r') { |io| Config.load io }
+      if File.exists? CFG_FILENAME
+        File.open(CFG_FILENAME, 'r') { |io| Config.load io }
       else
         Config.new
       end
   end
 
   def save_config
-    File.open(DATA_FILENAME, 'w') { |io| config.save(io) }
+    File.open(CFG_FILENAME, 'w') { |io| config.save(io) }
   end
 
   def episodes
@@ -143,9 +151,9 @@ class Main
     case
     when File.file?(ref)
       ref
-    when ref =~ /\d+/
+    when ref =~ /^\d+$/
       ref_i = ref.to_i
-      id = config.index_zero ? ref_i : ref_i - 1
+      id = config.index_from_zero ? ref_i : ref_i - 1
       episode_by_id(id)
     else
       raise CommandError, "Can't parse episode reference '#{ref}'"
