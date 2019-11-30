@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'time'
-require 'readline'
+require 'io/console'
 require_relative 'config'
 
 class NoCommandError < StandardError; end
@@ -16,6 +16,8 @@ class Main
     play 
   end
 
+  alias l last
+
   def next
     if config.last
       config.last = episode_by_id(last_id + 1)
@@ -26,10 +28,14 @@ class Main
     play 
   end
 
+  alias n next
+
   def prev
     config.last = episode_by_id(last_id - 1)
     play 
   end
+
+  alias p prev
 
   def no(n_str)
     n =
@@ -51,9 +57,12 @@ class Main
     end
   end
 
+  alias c cfg
+
   def reset(param = nil)
     if param.nil?
-      if "y" == Readline.readline('Reset all config parameters? (y|N) ').strip
+      puts 'Reset all config parameters (remove ./.episode)? (y|N)'
+      if 'y' == $stdin.getch
         FileUtils.rm_f(CFG_FILENAME)
       end
       return
@@ -69,6 +78,8 @@ class Main
     config.send("#{param}=", nil)
     save_config
   end
+
+  alias r reset
 
   def set(param, value)
     unless config.respond_to? param
@@ -105,9 +116,24 @@ class Main
     save_config
   end
 
+  alias s set
+
   def ls
+    total = episodes.size
+
+    return if total == 0
+
+    padding = 
+      if config.index_from_zero 
+        Math.log10(total - 1).floor + 1
+      else
+        Math.log10(total).floor + 1
+      end
+
     episodes.each_with_index do |filename, id|
-      puts "#{config.index_from_zero ? id : id + 1} | #{filename}"
+      id = config.index_from_zero ? id : id + 1
+      id_formatted = id.to_s.rjust(padding, '0')
+      puts "#{id_formatted} | #{filename}"
     end
   end
 
@@ -165,9 +191,9 @@ class Main
       raise CommandError, <<~EOS
         Last episode is undefined.
 
-        Please run `#{PROGRAM_NAME} next` to watch first episode
-        `#{PROGRAM_NAME} set last <file-name>`, or `#{PROGRAM_NAME} set last <episode-number>` 
-        to define where to start from.
+        Please run 
+        `#{PROGRAM_NAME} #{config.index_from_zero ? 0 : 1}` or `ep next` -- to watch first episode
+        `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define where to start from
       EOS
     end
 
