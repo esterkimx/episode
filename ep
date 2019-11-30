@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require_relative 'main'
+
+PROGRAM_NAME = File.basename($PROGRAM_NAME)
+DATA_FILENAME = '.episode'
+
+options = {}
+opt_parser = 
+  OptionParser.new do |opts|
+    opts.program_name = PROGRAM_NAME
+    opts.version = '0.1'
+    opts.banner = <<~EOS
+    Usage: #{PROGRAM_NAME} <command> [arguments] [options]
+
+      Commands:
+        last              Re-play episode watched last time 
+        next              Play next episode
+        prev              Play previous episode (one before 'last') 
+        no                Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
+        reset             Forget about the last episode
+        cfg               Print current config
+        set               Change config parameter
+        ls                List all episodes
+
+      Options for last, next, prev, and num:
+    EOS
+
+    opts.on('-n', '--name', "Show episode name, but don't play it") do
+      options[:name] = true
+    end
+    
+    opts.on('-o', '--no-update', "Don't update .episode file") do
+      options[:update] = false
+    end
+  end
+opt_parser.parse!
+
+unless command = ARGV[0] 
+  $stderr.puts opt_parser.help
+  return
+end
+
+begin
+  Main.new(options).send(command, *ARGV[1..])
+rescue NoCommandError => e
+  $stderr.puts <<~EOS
+    Error: Unknown command '#{e.message}'. 
+    Run `#{PROGRAM_NAME} -h` to see the list of all available commands.
+  EOS
+rescue CommandError => e
+  $stderr.puts e.message
+end
