@@ -12,6 +12,47 @@ class Main
     @is_update = opts[:update] != false
   end
 
+  def ls
+    return if episodes.empty?
+
+    total = episodes.size
+    padding = Math.log10(config.index_from_zero ? total - 1 : total).floor + 1
+
+    episodes.each_with_index do |filename, id|
+      id_fixed = config.index_from_zero ? id : id + 1
+      id_formatted = id_fixed.to_s.rjust(padding, '0')
+      puts "#{id_formatted} | #{filename}"
+    end
+  end
+
+  def status
+    puts "#{last_id} | #{config.last}"
+
+    unless config.last_played_at
+      puts 'Time unknown'
+      return
+    end
+
+    seconds_ago = (Time.now - config.last_played_at).floor
+    days_ago = seconds_ago / (3600 * 24)
+    hours_ago = (seconds_ago % (3600 * 24)) / 3600
+    minutes_ago = (seconds_ago % 3600) / 60
+    time_passed = 
+      if seconds_ago < 60
+        "#{seconds_ago} second#{seconds_ago == 1 ? '' : 's'}" 
+      else
+        [
+          days_ago > 0 ? "#{days_ago} day#{days_ago == 1 ? '' : 's'}" : nil,
+          hours_ago > 0 ? "#{hours_ago} hour#{hours_ago == 1 ? '' : 's'}" : nil,
+          minutes_ago > 0 ? "#{minutes_ago} minute#{minutes_ago == 1 ? '' : 's'}" : nil
+        ].compact.join(" ")
+      end
+      
+    puts "#{config.last_played_at} (#{time_passed} ago)" 
+  end
+
+  alias s status
+
   def last
     play 
   end
@@ -19,12 +60,7 @@ class Main
   alias l last
 
   def next
-    if config.last
-      config.last = episode_by_id(last_id + 1)
-    else
-      config.last = episodes.first
-    end
-
+    config.last = config.last ? episode_by_id(last_id + 1) : episodes.first
     play 
   end
 
@@ -52,90 +88,32 @@ class Main
   end
 
   def cfg
-    config.to_h.each do |k, v|
-      puts "#{k}: #{v}"
-    end
+    config.to_h.each { |param, val| puts "#{param}: #{val}" }
   end
 
   alias c cfg
-
-  def reset(param = nil)
-    if param.nil?
-      puts 'Reset all config parameters (remove ./.episode)? (y|N)'
-      if 'y' == $stdin.getch
-        FileUtils.rm_f(CFG_FILENAME)
-      end
-      return
-    end
-
-    unless config.respond_to? param
-      raise CommandError, <<~EOS
-        Unknown config parameter '#{param}'".
-        Run `#{PROGRAM_NAME} cfg` to see list of available parameters.
-      EOS
-    end
-
-    config.send("#{param}=", nil)
-    save_config
-  end
-
-  alias r reset
 
   def set(param, value)
     unless config.respond_to? param
       raise CommandError, <<~EOS
         Unknown config parameter '#{param}'".
-        Run `#{PROGRAM_NAME} cfg` to see list of available parameters.
+        Run `#{PROGRAM_NAME} cfg` to see the list of available parameters.
       EOS
     end
-
-    case param
-    when "last"
-      config.last = parse_episode_ref(value)
-    when "index_from_zero"
-      unless %w[true false].include? value
-        raise CommandError, <<~EOS
-          Invalid value '#{value}' for 'index_from_zero'.
-          Should be true or false.
-        EOS
-      end
-      config.index_from_zero = (value == "true")
-    when "last_played_at"
-      config.last_played_at = 
-        begin
-          Time.parse value 
-        rescue ArgumentError
-          raise CommandError, <<~EOS
-            Can't parse time
-          EOS
-        end
-    else
-      config.send("#{param}=", value)
-    end
-
+    config.send "#{param}=", parse_config_value(param, value)
     save_config
   end
 
-  alias s set
-
-  def ls
-    total = episodes.size
-
-    return if total == 0
-
-    padding = 
-      if config.index_from_zero 
-        Math.log10(total - 1).floor + 1
-      else
-        Math.log10(total).floor + 1
-      end
-
-    episodes.each_with_index do |filename, id|
-      id = config.index_from_zero ? id : id + 1
-      id_formatted = id.to_s.rjust(padding, '0')
-      puts "#{id_formatted} | #{filename}"
+  def reset(param = nil)
+    if param.nil?
+      puts 'Reset all config parameters (remove ./.episode)? (y|N)'
+      FileUtils.rm_f(CFG_FILENAME) if 'y' == $stdin.getch
+    else
+      set(param, nil)
     end
   end
+
+  alias r reset
 
   private
 
@@ -190,8 +168,7 @@ class Main
     unless config.last
       raise CommandError, <<~EOS
         Last episode is undefined.
-
-        Please run 
+        Please run:
         `#{PROGRAM_NAME} #{config.index_from_zero ? 0 : 1}` or `ep next` -- to watch first episode
         `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define where to start from
       EOS
@@ -216,6 +193,34 @@ class Main
     if update?
       config.last_played_at = Time.now
       save_config 
+    end
+  end
+
+  def parse_config_value(param, value)
+    return if value.nil?
+
+    case param
+    when "last"
+      config.last = parse_episode_ref(value)
+    when "index_from_zero"
+      unless %w[true false].include? value
+        raise CommandError, <<~EOS
+          Invalid value '#{value}' for 'index_from_zero'.
+          Should be true or false.
+        EOS
+      end
+      config.index_from_zero = (value == "true")
+    when "last_played_at"
+      config.last_played_at = 
+        begin
+          Time.parse value 
+        rescue ArgumentError
+          raise CommandError, <<~EOS
+            Can't parse time
+          EOS
+        end
+    else
+      value
     end
   end
 end

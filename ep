@@ -10,7 +10,7 @@ options = {}
 opt_parser = 
   OptionParser.new do |opts|
     opts.program_name = PROGRAM_NAME
-    opts.version = '0.1'
+    opts.version = '0.2'
     opts.banner = <<~EOS
     Usage: #{PROGRAM_NAME} [options] <command> 
 
@@ -20,15 +20,16 @@ opt_parser =
         ep next   play next episode (or first)
 
       Commands:
+            ls                    List all episodes and their idnexes
+        (s) status                Show information about last view
         (l) last                  Re-play episode watched last time 
         (n) next                  Play next episode
         (p) prev                  Play previous episode (one before 'last') 
             <number>              Same as `#{PROGRAM_NAME} no <number>` (i.e. `#{PROGRAM_NAME} 11`)
             no                    Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
         (c) cfg                   Display config for current directory
+            set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
         (r) reset [param]         Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
-        (s) set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
-            ls                    List all episodes
 
       Options for last, next, prev, and no:
     EOS

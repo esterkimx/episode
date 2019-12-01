@@ -1,4 +1,5 @@
 require 'json'
+require 'time'
 
 DEFAULT_CFG = {
   viewer: 'mpv',
@@ -18,7 +19,7 @@ class Config
   def initialize(cfg = {})
     @dir = cfg[:dir]
     @last = cfg[:last]
-    @last_played_at = cfg[:last_played_at]
+    @last_played_at = Time.parse cfg[:last_played_at] rescue nil
     @viewer = cfg[:viewer]
     @index_from_zero = cfg[:index_from_zero]
   end
