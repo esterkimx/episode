@@ -80,7 +80,7 @@ class Main
   def no(n_str)
     n =
       begin
-        Integer(n_str.gsub /^0+/, '') 
+        Integer(n_str.gsub /^0*/, '') 
       rescue ArgumentError
         raise CommandError, <<~EOS
           Invalid value '#{n_str}'.
