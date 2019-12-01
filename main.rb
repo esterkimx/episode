@@ -218,7 +218,7 @@ class Main
       puts last_safe
     else
       $stderr.puts "Playing #{last_safe}"
-      exec "#{config.viewer} #{File.join(config.dir, last_safe).inspect}"
+      system config.viewer, File.join(config.dir, last_safe)
     end
 
     if update?
