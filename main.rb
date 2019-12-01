@@ -24,12 +24,13 @@ class Main
     episodes.each_with_index do |filename, id|
       id_fixed = config.index_from_zero ? id : id + 1
       id_formatted = id_fixed.to_s.rjust(padding, '0')
-      puts "#{id_formatted} | #{filename}"
+      separator = id == last_id ? '*' : '|'
+      puts "#{id_formatted} #{separator} #{filename}"
     end
   end
 
   def status
-    puts "#{last_id} | #{config.last}"
+    puts "#{config.index_from_zero ? last_id : last_id + 1} | #{config.last}"
 
     unless config.last_played_at
       puts 'Time unknown'
