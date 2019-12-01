@@ -9,8 +9,8 @@ CFG_FILENAME = '.episode'
 options = {}
 opt_parser = 
   OptionParser.new do |opts|
-    opts.program_name = PROGRAM_NAME
-    opts.version = '0.2'
+    opts.program_name = 'episode'
+    opts.version = '0.3'
     opts.banner = <<~EOS
     Usage: #{PROGRAM_NAME} [options] <command> 
 
@@ -30,6 +30,7 @@ opt_parser =
         (c) cfg                   Display config for current directory
             set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
         (r) reset [param]         Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
+        (h) help                  Show this help
 
       Options for last, next, prev, and no:
     EOS
@@ -44,7 +45,7 @@ opt_parser =
   end
 opt_parser.parse!
 
-unless ARGV[0] 
+if [nil, 'h', 'help'].include? ARGV[0]
   $stderr.puts opt_parser.help
   return
 end

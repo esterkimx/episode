@@ -6,7 +6,7 @@ Enumerates all videos in the directory and allows to refrence them only by a num
 Usage: ep [options] <command> 
 
   Quick start:
-    ep ls     show episodes in current directory with their indexes
+    ep ls     list episodes in the current directory with their indexes
     ep 7      play episode #7
     ep next   play next episode (or first)
 
@@ -21,6 +21,7 @@ Usage: ep [options] <command>
     (c) cfg                   Display config for current directory
         set <param> <value>   Set config parameter (i.e. `ep set last 11`)
     (r) reset [param]         Reset config parameter (i.e. `ep reset last`)
+    (h) help                  Show this help
 
   Options for last, next, prev, and no:
     -n, --name                       Show episode name, but don't play it (i.e. `ep -n 11`)
