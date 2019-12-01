@@ -100,7 +100,7 @@ class Main
   def set(param, value)
     unless config.respond_to? param
       raise CommandError, <<~EOS
-        Unknown config parameter '#{param}'".
+        Unknown config parameter '#{param}'.
         Run `#{PROGRAM_NAME} cfg` to see the list of available parameters.
       EOS
     end
@@ -218,7 +218,7 @@ class Main
       puts last_safe
     else
       $stderr.puts "Playing #{last_safe}"
-      `#{config.viewer} '#{File.join(config.dir, last_safe)}'`
+      exec "#{config.viewer} #{File.join(config.dir, last_safe).inspect}"
     end
 
     if update?
