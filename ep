@@ -5,7 +5,8 @@ require_relative 'main'
 
 PROGRAM_NAME = File.basename($PROGRAM_NAME)
 CFG_FILENAME = '.episode'
-GLOBAL_CFG_PATH = File.join(ENV['HOME'], '.config', 'episode')
+CONFIG_DIR = ENV['XDG_CONFIG_HOME'] || File.join(ENV['HOME'], '.config')
+GLOBAL_CFG_PATH = File.join(CONFIG_DIR, 'episode')
 
 options = {}
 opt_parser = 
