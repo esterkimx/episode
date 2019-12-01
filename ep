@@ -59,7 +59,7 @@ else
 end
 
 begin    
-  Main.new(options).send(command, *args)
+  Main.new(options).public_send(command, *args)
 rescue NoCommandError => e
   $stderr.puts <<~EOS
     Error: Unknown command '#{e.message}'. 
