@@ -113,7 +113,7 @@ class Main
       end
 
     cfg.send "#{param}=", parse_config_value(param, value)
-    File.open(cfg_path, 'w') { |io| cfg.save(io) }
+    config_save_safe(cfg_path, cfg)
   end
 
   def reset(param = nil)
@@ -215,7 +215,7 @@ class Main
 
     if update?
       config.last_played_at = Time.now
-      File.open(CFG_FILENAME, 'w') { |io| config.save(io) }
+      config_save_safe(CFG_FILENAME, config)
     end
   end
 
@@ -245,5 +245,13 @@ class Main
     else
       value
     end
+  end
+
+  def config_save_safe(path, cfg)
+    File.open(path, 'w') { |io| cfg.save(io) }
+  rescue Errno::EACCES
+    raise CommandError, <<~EOS
+      Failed to save the episode data: can't write to this directory.
+    EOS
   end
 end
