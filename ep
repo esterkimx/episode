@@ -12,7 +12,7 @@ options = {}
 opt_parser = 
   OptionParser.new do |opts|
     opts.program_name = 'episode'
-    opts.version = '0.6'
+    opts.version = '0.8'
     opts.banner = <<~EOS
     Usage: #{PROGRAM_NAME} [options] <command> 
 
@@ -54,12 +54,14 @@ opt_parser =
   end
 opt_parser.parse!
 
-if [nil, 'h', 'help'].include? ARGV[0]
+case
+when ARGV[0].nil?
+  command = 'ls'
+  args = []
+when %w[h help].include?(ARGV[0])
   $stderr.puts opt_parser.help
   return
-end
-
-if ARGV[0] =~ /^\d+$/
+when ARGV[0] =~ /^\d+$/
   command = 'no'
   args = [ARGV[0]]
 else

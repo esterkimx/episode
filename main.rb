@@ -197,6 +197,15 @@ class Main
       EOS
     end
 
+    unless File.file? config.last
+      raise CommandError, <<~EOS
+        '#{config.last}' doesn't exist.
+        To fix it run:
+        `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
+        `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
+      EOS
+    end
+
     config.last
   end
 
@@ -207,11 +216,10 @@ class Main
   def play
     if name?
       puts last_safe
-      return
+    else
+      $stderr.puts "Playing #{last_safe}"
+      `#{config.viewer} '#{File.join(config.dir, last_safe)}'`
     end
-  
-    $stderr.puts "Playing #{last_safe}"
-    `#{config.viewer} '#{File.join(config.dir, last_safe)}'`
 
     if update?
       config.last_played_at = Time.now

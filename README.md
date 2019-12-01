@@ -18,7 +18,7 @@ Usage: ep [options] <command>
     (n) next                  Play next episode
     (p) prev                  Play previous episode (one before 'last') 
         <number>              Same as `ep no <number>` (i.e. `ep 11`)
-        no                    Play episode by number (i.e. `ep no 11`) 
+        no <number>           Play episode by number (i.e. `ep no 11`) 
     (c) cfg                   Display config for current directory
         set <param> <value>   Set config parameter (i.e. `ep set last 11`)
     (r) reset [param]         Reset config parameter (i.e. `ep reset last`)
