@@ -29,5 +29,5 @@ Usage: ep [options] <command>
     -o, --no-update                  Don't update .episode file
 
   Options for `set` and `reset`:
-    -g, --global                     Edit global config (/home/esterkimx/.config/episode)
+    -g, --global                     Edit global config ($HOME/.config/episode)
 ```
