@@ -6,9 +6,10 @@ Enumerates all videos in the directory and allows to refrence them only by a num
 Usage: ep [options] <command> 
 
   Quick start:
-    ep ls     list episodes in the current directory with their indexes
-    ep 7      play episode #7
-    ep next   play next episode (or first)
+    ep ls                     show episodes in current directory with their indexes
+    ep 7                      play episode #7
+    ep next                   play next episode (or first)
+    ep -g set viewer vlc      always use VLC as a video player (default is mpv)
 
   Commands:
         ls                    List all episodes and their idnexes
@@ -23,7 +24,10 @@ Usage: ep [options] <command>
     (r) reset [param]         Reset config parameter (i.e. `ep reset last`)
     (h) help                  Show this help
 
-  Options for last, next, prev, and no:
+  Options for `last`, `next`, `prev`, and `no`:
     -n, --name                       Show episode name, but don't play it (i.e. `ep -n 11`)
     -o, --no-update                  Don't update .episode file
+
+  Options for `set` and `reset`:
+    -g, --global                     Edit global config (/home/esterkimx/.config/episode)
 ```
