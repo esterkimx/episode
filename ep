@@ -5,19 +5,21 @@ require_relative 'main'
 
 PROGRAM_NAME = File.basename($PROGRAM_NAME)
 CFG_FILENAME = '.episode'
+GLOBAL_CFG_PATH = File.join(ENV['HOME'], '.config', 'episode')
 
 options = {}
 opt_parser = 
   OptionParser.new do |opts|
     opts.program_name = 'episode'
-    opts.version = '0.3'
+    opts.version = '0.5'
     opts.banner = <<~EOS
     Usage: #{PROGRAM_NAME} [options] <command> 
 
       Quick start:
-        ep ls     show episodes in current directory with their indexes
-        ep 7      play episode #7
-        ep next   play next episode (or first)
+        ep ls                     show episodes in current directory with their indexes
+        ep 7                      play episode #7
+        ep next                   play next episode (or first)
+        ep -g set viewer vlc      always use VLC as a video player (default is mpv)
 
       Commands:
             ls                    List all episodes and their idnexes
@@ -31,9 +33,9 @@ opt_parser =
             set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
         (r) reset [param]         Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
         (h) help                  Show this help
-
-      Options for last, next, prev, and no:
     EOS
+      
+    opts.separator("\n  Options for `last`, `next`, `prev`, and `no`:")
 
     opts.on('-n', '--name', "Show episode name, but don't play it (i.e. `#{PROGRAM_NAME} -n 11`)") do
       options[:name] = true
@@ -41,6 +43,12 @@ opt_parser =
     
     opts.on('-o', '--no-update', "Don't update .episode file") do
       options[:update] = false
+    end
+
+    opts.separator("\n  Options for `set` and `reset`:")
+
+    opts.on('-g', '--global', "Edit global config (#{GLOBAL_CFG_PATH})") do
+      options[:global] = true
     end
   end
 opt_parser.parse!

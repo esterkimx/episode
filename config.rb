@@ -12,16 +12,17 @@ class Config
   attr_writer :viewer
   attr_writer :index_from_zero
 
-  def self.load(io)
-    new JSON.parse(io.read, symbolize_names: true)
+  def self.load(io, opts = {})
+    new JSON.parse(io.read, symbolize_names: true).merge(opts)
   end
 
-  def initialize(cfg = {})
-    @dir = cfg[:dir]
-    @last = cfg[:last]
-    @last_played_at = Time.parse cfg[:last_played_at] rescue nil
-    @viewer = cfg[:viewer]
-    @index_from_zero = cfg[:index_from_zero]
+  def initialize(opts = {})
+    @default = opts[:default]&.to_h || DEFAULT_CFG
+    @dir = opts[:dir]
+    @last = opts[:last]
+    @last_played_at = Time.parse opts[:last_played_at] rescue nil
+    @viewer = opts[:viewer]
+    @index_from_zero = opts[:index_from_zero]
   end
 
   def save(io)
@@ -48,15 +49,19 @@ class Config
     end
   end
 
+  def default
+    self.class.new @default
+  end
+
   def dir
     @dir || Dir.pwd
   end
 
   def viewer
-    @viewer || DEFAULT_CFG[:viewer]
+    @viewer || @default[:viewer]
   end
 
   def index_from_zero
-    @index_from_zero || DEFAULT_CFG[:index_from_zero]
+    @index_from_zero || @default[:index_from_zero]
   end
 end

@@ -3,6 +3,8 @@ require 'time'
 require 'io/console'
 require_relative 'config'
 
+FORMATS = %w[mkv mp4 avi]
+
 class NoCommandError < StandardError; end
 class CommandError < StandardError; end
 
@@ -10,6 +12,7 @@ class Main
   def initialize(opts) 
     @is_name = opts[:name] || false
     @is_update = opts[:update] != false
+    @is_global = opts[:global] || false
   end
 
   def ls
@@ -100,14 +103,24 @@ class Main
         Run `#{PROGRAM_NAME} cfg` to see the list of available parameters.
       EOS
     end
-    config.send "#{param}=", parse_config_value(param, value)
-    save_config
+
+    cfg, cfg_path =
+      if global? 
+        [config.default, GLOBAL_CFG_PATH]
+      else
+        [config, CFG_FILENAME]
+      end
+
+    cfg.send "#{param}=", parse_config_value(param, value)
+    File.open(cfg_path, 'w') { |io| cfg.save(io) }
   end
 
   def reset(param = nil)
+    cfg_path = global? ? GLOBAL_CFG_PATH : CFG_FILENAME  
+
     if param.nil?
-      puts 'Reset all config parameters (remove ./.episode)? (y|N)'
-      FileUtils.rm_f(CFG_FILENAME) if 'y' == $stdin.getch
+      puts "Reset all config parameters (delete #{cfg_path})? (y|N)"
+      FileUtils.rm_f(cfg_path) if 'y' == $stdin.getch
     else
       set(param, nil)
     end
@@ -129,21 +142,30 @@ class Main
     @is_update
   end
 
+  def global?
+    @is_global
+  end
+
   def config
-    @config ||= 
+    return @config if @config
+
+    default_cfg =
+      if File.exists? GLOBAL_CFG_PATH
+        File.open(GLOBAL_CFG_PATH, 'r') { |io| Config.load io }
+      end
+
+    @config = 
       if File.exists? CFG_FILENAME
-        File.open(CFG_FILENAME, 'r') { |io| Config.load io }
+        File.open(CFG_FILENAME, 'r') { |io| Config.load io, default: default_cfg }
       else
-        Config.new
+        Config.new(default: default_cfg)
       end
   end
 
-  def save_config
-    File.open(CFG_FILENAME, 'w') { |io| config.save(io) }
-  end
-
   def episodes
-    @episodes ||= Dir['./*{mkv,mp4,avi}'].map { |path| File.basename(path) }.sort
+    @episodes ||= 
+      Dir["./*{#{FORMATS.join(',')}}"]
+        .map { |path| File.basename(path) }.sort
   end
 
   def episode_by_id(id)
@@ -192,7 +214,7 @@ class Main
 
     if update?
       config.last_played_at = Time.now
-      save_config 
+      File.open(CFG_FILENAME, 'w') { |io| config.save(io) }
     end
   end
 
