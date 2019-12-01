@@ -1,6 +1,6 @@
 # Episode (ep)
 Remembers what video in the directory you watched last time.
-Enumerates all videos in the directory and allows to refrence them only by a number.
+Enumerates all videos in the directory and allows to reference them only by a number.
 
 ```
 Usage: ep [options] <command> 
