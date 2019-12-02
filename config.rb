@@ -12,6 +12,7 @@ class Config
   attr_accessor :last_played_at
   attr_writer :viewer
   attr_writer :index_from_zero
+  attr_writer :pointer
 
   def self.load(io, opts = {})
     new JSON.parse(io.read, symbolize_names: true).merge(opts)
