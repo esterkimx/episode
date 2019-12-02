@@ -16,7 +16,9 @@ class Main
   end
 
   def ls
-    return if episodes.empty?
+    if episodes.empty?
+      raise CommandError, 'No episodes found in the directory'
+    end
 
     total = episodes.size
     padding = Math.log10(config.index_from_zero ? total - 1 : total).floor + 1
@@ -246,9 +248,7 @@ class Main
         begin
           Time.parse value 
         rescue ArgumentError
-          raise CommandError, <<~EOS
-            Can't parse time
-          EOS
+          raise CommandError, "Can't parse time"
         end
     else
       value
