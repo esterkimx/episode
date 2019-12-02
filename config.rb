@@ -3,7 +3,8 @@ require 'time'
 
 DEFAULT_CFG = {
   viewer: 'mpv',
-  index_from_zero: false
+  index_from_zero: false,
+  pointer: '*'
 }
 
 class Config
@@ -23,6 +24,7 @@ class Config
     @last_played_at = Time.parse opts[:last_played_at] rescue nil
     @viewer = opts[:viewer]
     @index_from_zero = opts[:index_from_zero]
+    @pointer = opts[:pointer]
   end
 
   def save(io)
@@ -36,7 +38,8 @@ class Config
         last: @last,
         last_played_at: @last_played_at,
         viewer: @viewer,
-        index_from_zero: @index_from_zero
+        index_from_zero: @index_from_zero,
+        pointer: @pointer
       }.compact
     else
       { 
@@ -44,7 +47,8 @@ class Config
         last: last,
         last_played_at: last_played_at,
         viewer: viewer,
-        index_from_zero: index_from_zero
+        index_from_zero: index_from_zero,
+        pointer: pointer
       }
     end
   end
@@ -63,5 +67,9 @@ class Config
 
   def index_from_zero
     @index_from_zero || @default[:index_from_zero]
+  end
+
+  def pointer 
+    @pointer || @default[:pointer]
   end
 end

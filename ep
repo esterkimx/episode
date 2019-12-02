@@ -12,7 +12,7 @@ options = {}
 opt_parser = 
   OptionParser.new do |opts|
     opts.program_name = 'episode'
-    opts.version = '0.9'
+    opts.version = '0.10'
     opts.banner = <<~EOS
     Usage: #{PROGRAM_NAME} [options] <command> 
 

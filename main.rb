@@ -26,7 +26,7 @@ class Main
     episodes.each_with_index do |filename, id|
       id_fixed = config.index_from_zero ? id : id + 1
       id_formatted = id_fixed.to_s.rjust(padding, '0')
-      separator = (config.last && id == last_id) ? '*' : '|'
+      separator = (config.last && id == last_id) ? config.pointer : '|'
       puts "#{id_formatted} #{separator} #{filename}"
     end
   end
