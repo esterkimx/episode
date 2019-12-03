@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require_relative 'main'
+require_relative '../lib/main'
 
 PROGRAM_NAME = File.basename($PROGRAM_NAME)
+VERSION = 0
 CFG_FILENAME = '.episode'
 CONFIG_DIR = ENV['XDG_CONFIG_HOME'] || File.join(ENV['HOME'], '.config')
 GLOBAL_CFG_PATH = File.join(CONFIG_DIR, 'episode')
@@ -12,15 +13,16 @@ options = {}
 opt_parser = 
   OptionParser.new do |opts|
     opts.program_name = 'episode'
-    opts.version = '0.10'
+    opts.version = "v#{VERSION}"
     opts.banner = <<~EOS
     Usage: #{PROGRAM_NAME} [options] <command> 
 
       Quick start:
         ep ls                     show episodes in the current directory with their indexes
+        ep                        same as `ep ls`
         ep 7                      play episode #7
         ep next                   play next episode (or first)
-        ep -g set viewer vlc      always use VLC as a video player (default is mpv)
+        ep -g set viewer vlc      use VLC as default video player (by default it's mpv)
 
       Commands:
             ls                    List all episodes and their idnexes
@@ -46,9 +48,13 @@ opt_parser =
       options[:update] = false
     end
 
-    opts.separator("\n  Options for `set` and `reset`:")
+    opts.on('-v', '--viewer <program>', 'set viewer') do |viewer|
+      options[:viewer] = viewer
+    end
 
-    opts.on('-g', '--global', "Edit global config (#{GLOBAL_CFG_PATH})") do
+    opts.separator("\n  Options for `cfg`, `set` and `reset`:")
+
+    opts.on('-g', '--global', "Edit (or show) global config (#{GLOBAL_CFG_PATH})") do
       options[:global] = true
     end
   end

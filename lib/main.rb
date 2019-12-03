@@ -13,6 +13,7 @@ class Main
     @is_name = opts[:name] || false
     @is_update = opts[:update] != false
     @is_global = opts[:global] || false
+    @viewer = opts[:viewer]
   end
 
   def ls
@@ -32,7 +33,7 @@ class Main
   end
 
   def status
-    puts "#{config.index_from_zero ? last_id : last_id + 1} | #{config.last}"
+    puts "#{config.index_from_zero ? last_id : last_id + 1} #{config.pointer} #{config.last}"
 
     unless config.last_played_at
       puts 'Time unknown'
@@ -94,7 +95,8 @@ class Main
   end
 
   def cfg
-    config.to_h.each { |param, val| puts "#{param}: #{val}" }
+    cfg_h = global? ? config.global.to_h : config.to_h
+    cfg_h.each { |param, val| puts "#{param}: #{val}" }
   end
 
   alias c cfg
@@ -109,13 +111,15 @@ class Main
 
     cfg, cfg_path =
       if global? 
-        [config.default, GLOBAL_CFG_PATH]
+        [config.global, GLOBAL_CFG_PATH]
       else
         [config, CFG_FILENAME]
       end
 
     cfg.send "#{param}=", parse_config_value(param, value)
     config_save_safe(cfg_path, cfg)
+  rescue NotLocal
+    raise CommandError, "Parameter '#{param}' is not global"
   end
 
   def reset(param = nil)
@@ -152,17 +156,21 @@ class Main
   def config
     return @config if @config
 
-    default_cfg =
+    global_cfg =
       if File.exists? GLOBAL_CFG_PATH
         File.open(GLOBAL_CFG_PATH, 'r') { |io| Config.load io }
       end
 
     @config = 
       if File.exists? CFG_FILENAME
-        File.open(CFG_FILENAME, 'r') { |io| Config.load io, default: default_cfg }
+        File.open(CFG_FILENAME, 'r') { |io| Config.load io, global: global_cfg }
       else
-        Config.new(default: default_cfg)
+        Config.new(global: global_cfg)
       end
+  end
+
+  def viewer
+    @viewer || config.viewer
   end
 
   def episodes
@@ -220,7 +228,7 @@ class Main
       puts last_safe
     else
       $stderr.puts "Playing #{last_safe}"
-      system config.viewer, File.join(config.dir, last_safe)
+      system viewer, File.join(config.dir, last_safe)
     end
 
     if update?
@@ -233,9 +241,9 @@ class Main
     return if value.nil?
 
     case param
-    when "last"
+    when 'last'
       config.last = parse_episode_ref(value)
-    when "index_from_zero"
+    when 'index_from_zero'
       unless %w[true false].include? value
         raise CommandError, <<~EOS
           Invalid value '#{value}' for 'index_from_zero'.
@@ -243,13 +251,15 @@ class Main
         EOS
       end
       config.index_from_zero = (value == "true")
-    when "last_played_at"
+    when 'last_played_at'
       config.last_played_at = 
         begin
           Time.parse value 
         rescue ArgumentError
           raise CommandError, "Can't parse time"
         end
+    when 'pointer'
+      config.pointer = "\"#{value}\"".undump
     else
       value
     end

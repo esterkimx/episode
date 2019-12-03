@@ -7,9 +7,10 @@ Usage: ep [options] <command>
 
   Quick start:
     ep ls                     show episodes in the current directory with their indexes
+    ep                        same as `ep ls`
     ep 7                      play episode #7
     ep next                   play next episode (or first)
-    ep -g set viewer vlc      always use VLC as a video player (default is mpv)
+    ep -g set viewer vlc      use VLC as default video player (by default it's mpv)
 
   Commands:
         ls                    List all episodes and their idnexes
@@ -27,7 +28,25 @@ Usage: ep [options] <command>
   Options for `last`, `next`, `prev`, and `no`:
     -n, --name                       Show episode name, but don't play it (i.e. `ep -n 11`)
     -o, --no-update                  Don't update .episode file
+    -v, --viewer <program>           set viewer
 
-  Options for `set` and `reset`:
-    -g, --global                     Edit global config ($HOME/.config/episode)
+  Options for `cfg`, `set` and `reset`:
+    -g, --global                     Edit (or show) global config ($HOME/.config/episode)
 ```
+
+##### Coloring the 'last' pointer
+```
+ep -g set pointer '\u001b[33;1m*\u001b[0m'
+```
+<img src="https://static.hedlx.org/episode_coloring_pointer.png">
+
+##### Removing all episode data from a directory
+```
+ep r
+```
+
+##### Restoring global default settings
+```
+ep -g r
+```
+
