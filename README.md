@@ -2,6 +2,8 @@
 Remembers what video in the directory you watched last time.
 Enumerates all videos in the directory and allows to reference them only by a number.
 
+## Usage
+
 ```
 Usage: ep [options] <command> 
 
@@ -28,11 +30,13 @@ Usage: ep [options] <command>
   Options for `last`, `next`, `prev`, and `no`:
     -n, --name                       Show episode name, but don't play it (i.e. `ep -n 11`)
     -o, --no-update                  Don't update .episode file
-    -v, --viewer <program>           set viewer
+    -v, --viewer <program>           Set viewer
 
   Options for `cfg`, `set` and `reset`:
     -g, --global                     Edit (or show) global config ($HOME/.config/episode)
 ```
+
+## Examples
 
 ##### Coloring the 'last' pointer
 ```
@@ -40,7 +44,7 @@ ep -g set pointer '\u001b[33;1m*\u001b[0m'
 ```
 <img src="https://static.hedlx.org/episode_coloring_pointer.png">
 
-##### Removing all episode data from a directory
+##### Purging all `episode` data from a directory
 ```
 ep r
 ```

@@ -48,7 +48,7 @@ opt_parser =
       options[:update] = false
     end
 
-    opts.on('-v', '--viewer <program>', 'set viewer') do |viewer|
+    opts.on('-v', '--viewer <program>', 'Set viewer') do |viewer|
       options[:viewer] = viewer
     end
 
