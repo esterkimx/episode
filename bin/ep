@@ -6,8 +6,8 @@ require_relative '../lib/episode'
 PROGRAM_NAME = File.basename($PROGRAM_NAME)
 VERSION = 0
 CFG_FILENAME = '.episode'
-CONFIG_DIR = ENV['XDG_CONFIG_HOME'] || File.join(ENV['HOME'], '.config')
-GLOBAL_CFG_PATH = File.join(CONFIG_DIR, 'episode')
+CFG_GLOBAL_DIR = ENV['XDG_CONFIG_HOME'] || File.join(ENV['HOME'], '.config')
+CFG_GLOBAL_PATH = File.join(CFG_GLOBAL_DIR, 'episode')
 
 options = {}
 opt_parser = 
@@ -54,7 +54,7 @@ opt_parser =
 
     opts.separator("\n  Options for `cfg`, `set` and `reset`:")
 
-    opts.on('-g', '--global', "Edit (or show) global config (#{GLOBAL_CFG_PATH})") do
+    opts.on('-g', '--global', "Edit (or show) global config (#{CFG_GLOBAL_PATH})") do
       options[:global] = true
     end
   end

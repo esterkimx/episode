@@ -109,7 +109,7 @@ class Episode
 
     cfg, cfg_path =
       if global? 
-        [config.global, GLOBAL_CFG_PATH]
+        [config.global, CFG_GLOBAL_PATH]
       else
         [config, CFG_FILENAME]
       end
@@ -121,7 +121,7 @@ class Episode
   end
 
   def reset(param = nil)
-    cfg_path = global? ? GLOBAL_CFG_PATH : CFG_FILENAME  
+    cfg_path = global? ? CFG_GLOBAL_PATH : CFG_FILENAME  
 
     if param.nil?
       puts "Reset all config parameters (delete #{cfg_path})? (y|N)"
@@ -155,8 +155,8 @@ class Episode
     return @config if @config
 
     global_cfg =
-      if File.exists? GLOBAL_CFG_PATH
-        File.open(GLOBAL_CFG_PATH, 'r') { |io| Config.load io }
+      if File.exists? CFG_GLOBAL_PATH
+        File.open(CFG_GLOBAL_PATH, 'r') { |io| Config.load io }
       end
 
     @config = 
