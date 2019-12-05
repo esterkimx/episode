@@ -174,6 +174,7 @@ class Episode
   def episodes
     @episodes ||= 
       Dir["./*{#{config.formats.join(',')}}"]
+        .select { |path| File.file? path }
         .map { |path| File.basename(path) }.sort
   end
 
