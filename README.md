@@ -1,6 +1,6 @@
 # Episode (ep)
-Remembers what video in the directory you watched last time.
-Enumerates all videos in the directory and allows to reference them only by a number.
+Remembers what file in the directory you viewed last time.
+Enumerates all files in the directory and allows to reference them only by a number.
 
 ## Usage
 
@@ -36,21 +36,42 @@ Usage: ep [options] <command>
     -g, --global                     Edit (or show) global config ($HOME/.config/episode)
 ```
 
-## Examples
+## More Examples
 
-##### Coloring the 'last' pointer
+#### Coloring the 'last' pointer
 ```
 ep -g set pointer '\u001b[33;1m*\u001b[0m'
 ```
 <img src="https://static.hedlx.org/episode_coloring_pointer.png">
 
-##### Purging all `episode` data from a directory
+#### Purging all `episode` data from a directory
 ```
 ep r
 ```
 
-##### Restoring global default settings
+#### Restoring global default settings
 ```
 ep -g r
 ```
 
+#### Viewing different file formats 
+##### Pictures
+```
+ep set formats png,jpg
+ep set viewer feh
+```
+
+##### PDF
+```
+ep set formats pdf
+ep set viewer zathura
+```
+
+##### Any
+```
+ep set formats ''
+ep set viewer 'hexdump -C'
+
+# Invoking:
+ep next | less
+```

@@ -3,8 +3,6 @@ require 'time'
 require 'io/console'
 require_relative 'episode/config'
 
-FORMATS = %w[mkv mp4 avi]
-
 class NoCommandError < StandardError; end
 class CommandError < StandardError; end
 
@@ -175,7 +173,7 @@ class Episode
 
   def episodes
     @episodes ||= 
-      Dir["./*{#{FORMATS.join(',')}}"]
+      Dir["./*{#{config.formats.join(',')}}"]
         .map { |path| File.basename(path) }.sort
   end
 
@@ -227,8 +225,8 @@ class Episode
     if name?
       puts last_safe
     else
-      $stderr.puts "Playing #{last_safe}"
-      system viewer, File.join(config.dir, last_safe)
+      $stderr.puts "Viewing #{last_safe}"
+      system(*viewer.split(' '), File.join(config.dir, last_safe))
     end
 
     if update?
@@ -242,7 +240,7 @@ class Episode
 
     case param
     when 'last'
-      config.last = parse_episode_ref(value)
+      parse_episode_ref(value)
     when 'index_from_zero'
       unless %w[true false].include? value
         raise CommandError, <<~EOS
@@ -250,16 +248,17 @@ class Episode
           Should be true or false.
         EOS
       end
-      config.index_from_zero = (value == "true")
+      value == "true"
     when 'last_played_at'
-      config.last_played_at = 
-        begin
-          Time.parse value 
-        rescue ArgumentError
-          raise CommandError, "Can't parse time"
-        end
+      begin
+        Time.parse value 
+      rescue ArgumentError
+        raise CommandError, "Can't parse time"
+      end
     when 'pointer'
-      config.pointer = "\"#{value}\"".undump
+      "\"#{value}\"".undump
+    when 'formats'
+      value.split ','
     else
       value
     end

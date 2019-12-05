@@ -4,7 +4,8 @@ require 'time'
 DEFAULT_CFG = {
   viewer: 'mpv',
   index_from_zero: false,
-  pointer: '*'
+  pointer: '*',
+  formats: %w[mkv mp4 avi]
 }
 
 class NotLocal < StandardError; end
@@ -13,6 +14,7 @@ class Config
   attr_writer :viewer
   attr_writer :index_from_zero
   attr_writer :pointer
+  attr_writer :formats
 
   def self.load(io, opts = {})
     new JSON.parse(io.read, symbolize_names: true).merge(opts)
@@ -33,6 +35,7 @@ class Config
     @viewer = opts[:viewer]
     @index_from_zero = opts[:index_from_zero]
     @pointer = opts[:pointer]
+    @formats = opts[:formats]
   end
 
   def save(io)
@@ -44,7 +47,8 @@ class Config
       (@local || {}).merge({ 
         viewer: @viewer,
         index_from_zero: @index_from_zero,
-        pointer: @pointer
+        pointer: @pointer,
+        formats: @formats
       }).compact
     else
       local_h = { 
@@ -56,7 +60,8 @@ class Config
       (local_h || {}).merge({
         viewer: viewer,
         index_from_zero: index_from_zero,
-        pointer: pointer
+        pointer: pointer,
+        formats: formats
       })
     end
   end
@@ -103,6 +108,10 @@ class Config
 
   def pointer 
     @pointer || default(:pointer)
+  end
+
+  def formats
+    @formats || default(:formats)
   end
 
   private
