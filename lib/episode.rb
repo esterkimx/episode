@@ -3,10 +3,12 @@ require 'time'
 require 'io/console'
 require_relative 'episode/config'
 
-class NoCommandError < StandardError; end
-class CommandError < StandardError; end
-
 class Episode
+  VERSION = 1
+
+  class NoCommandError < StandardError; end
+  class CommandError < StandardError; end
+
   def initialize(opts) 
     @is_name = opts[:name] || false
     @is_update = opts[:update] != false

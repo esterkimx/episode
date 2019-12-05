@@ -4,7 +4,6 @@ require 'optparse'
 require_relative '../lib/episode'
 
 PROGRAM_NAME = File.basename($PROGRAM_NAME)
-VERSION = 0
 CFG_FILENAME = '.episode'
 CFG_GLOBAL_DIR = ENV['XDG_CONFIG_HOME'] || File.join(ENV['HOME'], '.config')
 CFG_GLOBAL_PATH = File.join(CFG_GLOBAL_DIR, 'episode')
@@ -13,16 +12,16 @@ options = {}
 opt_parser = 
   OptionParser.new do |opts|
     opts.program_name = 'episode'
-    opts.version = "v#{VERSION}"
+    opts.version = "v#{Episode::VERSION}"
     opts.banner = <<~EOS
-      Usage: #{PROGRAM_NAME} [options] <command> 
+      Usage: #{PROGRAM_NAME} <command> [options]  
 
         Quick start:
           ep ls                     show episodes in the current directory with their indexes
           ep                        same as `ep ls`
           ep 7                      play episode #7
           ep next                   play next episode (or first)
-          ep -g set viewer vlc      use VLC as default video player (by default it's mpv)
+          ep set viewer vlc -g      use VLC as default video player (by default it's mpv)
 
         Commands:
               ls                    List all episodes and their idnexes
@@ -83,11 +82,11 @@ rescue OptionParser::ParseError => e
     Error: #{e.message}
     Run `#{PROGRAM_NAME} -h` to see the list of available options.
   EOS
-rescue NoCommandError => e
+rescue Episode::NoCommandError => e
   $stderr.puts <<~EOS
     Error: Unknown command '#{e.message}'. 
     Run `#{PROGRAM_NAME} -h` to see the list of available commands.
   EOS
-rescue CommandError => e
+rescue Episode::CommandError => e
   $stderr.puts "Error: #{e.message}"
 end

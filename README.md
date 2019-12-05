@@ -2,17 +2,60 @@
 Remembers what file in the directory you viewed last time.
 Enumerates all files in the directory and allows to reference them only by a number.
 
-## Usage
+## Installation
 
+#### Using `gem`
 ```
-Usage: ep [options] <command> 
+gem install episode
+```
+
+#### Manual
+Clone this repository and add `bin/ep` to your `$PATH`.
+
+## Quick Start
+
+Episode creates `.episode` file in the current directory when you open some file with it. By default it will be looking for `mkv`, `avi` or `mp4` files and will use `mpv` as the viewer. Read [examples](#viewing-different-file-formats) below to see how to change this behavior.
+
+List episodes in the current directory.
+```
+ep
+``` 
+
+Watch episode #7
+```
+ep 7
+```
+
+Watch with VLC
+```
+ep 7 -v vlc
+``` 
+
+Make VLC default player for this directory (add `-g` to make it global)
+```
+ep set viewer vlc
+```
+
+Show config for the current directory
+```
+ep cfg
+```
+
+Show global config
+```
+ep cfg -g
+```
+
+## Usage (`ep help`)
+```
+Usage: ep <command> [options] 
 
   Quick start:
     ep ls                     show episodes in the current directory with their indexes
     ep                        same as `ep ls`
     ep 7                      play episode #7
     ep next                   play next episode (or first)
-    ep -g set viewer vlc      use VLC as default video player (by default it's mpv)
+    ep set viewer vlc -g      use VLC as default video player (by default it's mpv)
 
   Commands:
         ls                    List all episodes and their idnexes
@@ -44,30 +87,31 @@ ep -g set pointer '\u001b[33;1m*\u001b[0m'
 ```
 <img src="https://static.hedlx.org/episode_coloring_pointer.png">
 
-#### Purging all `episode` data from a directory
+#### Purging all `episode` data from the directory
 ```
 ep r
 ```
 
 #### Restoring global default settings
 ```
-ep -g r
+ep r -g
 ```
 
-#### Viewing different file formats 
-##### Pictures
+#### Viewing different file formats
+
+###### Pictures
 ```
 ep set formats png,jpg
 ep set viewer feh
 ```
 
-##### PDF
+###### PDF
 ```
 ep set formats pdf
 ep set viewer zathura
 ```
 
-##### Any
+###### Any
 ```
 ep set formats ''
 ep set viewer 'hexdump -C'
