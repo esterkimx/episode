@@ -80,7 +80,7 @@ begin
   Episode.new(options).public_send(command, *args)
 rescue OptionParser::ParseError => e
   $stderr.puts <<~EOS
-    Error: #{e.message}"
+    Error: #{e.message}
     Run `#{PROGRAM_NAME} -h` to see the list of available options.
   EOS
 rescue NoCommandError => e
