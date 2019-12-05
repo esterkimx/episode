@@ -1,14 +1,14 @@
 require 'fileutils'
 require 'time'
 require 'io/console'
-require_relative 'config'
+require_relative 'episode/config'
 
 FORMATS = %w[mkv mp4 avi]
 
 class NoCommandError < StandardError; end
 class CommandError < StandardError; end
 
-class Main
+class Episode
   def initialize(opts) 
     @is_name = opts[:name] || false
     @is_update = opts[:update] != false
@@ -202,8 +202,8 @@ class Main
       raise CommandError, <<~EOS
         Last episode is undefined.
         Please run:
-        `#{PROGRAM_NAME} #{config.index_from_zero ? 0 : 1}` or `ep next` -- to watch first episode
-        `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define where to start from
+          `#{PROGRAM_NAME} #{config.index_from_zero ? 0 : 1}` or `ep next` -- to watch first episode
+          `#{PROGRAM_NAME} set last <episode-number>` or `#{PROGRAM_NAME} set last <file-name>` -- to define where to start from
       EOS
     end
 
@@ -211,8 +211,8 @@ class Main
       raise CommandError, <<~EOS
         '#{config.last}' doesn't exist.
         To fix it run:
-        `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
-        `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
+          `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
+          `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
       EOS
     end
 
