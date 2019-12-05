@@ -15,27 +15,27 @@ opt_parser =
     opts.program_name = 'episode'
     opts.version = "v#{VERSION}"
     opts.banner = <<~EOS
-    Usage: #{PROGRAM_NAME} [options] <command> 
+      Usage: #{PROGRAM_NAME} [options] <command> 
 
-      Quick start:
-        ep ls                     show episodes in the current directory with their indexes
-        ep                        same as `ep ls`
-        ep 7                      play episode #7
-        ep next                   play next episode (or first)
-        ep -g set viewer vlc      use VLC as default video player (by default it's mpv)
+        Quick start:
+          ep ls                     show episodes in the current directory with their indexes
+          ep                        same as `ep ls`
+          ep 7                      play episode #7
+          ep next                   play next episode (or first)
+          ep -g set viewer vlc      use VLC as default video player (by default it's mpv)
 
-      Commands:
-            ls                    List all episodes and their idnexes
-        (s) status                Show information about last view
-        (l) last                  Re-play episode watched last time 
-        (n) next                  Play next episode
-        (p) prev                  Play previous episode (one before 'last') 
-            <number>              Same as `#{PROGRAM_NAME} no <number>` (i.e. `#{PROGRAM_NAME} 11`)
-            no <number>           Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
-        (c) cfg                   Display config for the current directory
-            set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
-        (r) reset [param]         Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
-        (h) help                  Show this help
+        Commands:
+              ls                    List all episodes and their idnexes
+          (s) status                Show information about last view
+          (l) last                  Re-play episode watched last time 
+          (n) next                  Play next episode
+          (p) prev                  Play previous episode (one before 'last') 
+              <number>              Same as `#{PROGRAM_NAME} no <number>` (i.e. `#{PROGRAM_NAME} 11`)
+              no <number>           Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
+          (c) cfg                   Display config for the current directory
+              set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
+          (r) reset [param]         Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
+          (h) help                  Show this help
     EOS
       
     opts.separator("\n  Options for `last`, `next`, `prev`, and `no`:")
