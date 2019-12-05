@@ -5,6 +5,7 @@ require_relative 'episode/config'
 
 class Episode
   VERSION = 1
+  VERSION_PATCH = 1
 
   class NoCommandError < StandardError; end
   class CommandError < StandardError; end
