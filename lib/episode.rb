@@ -159,6 +159,8 @@ class Episode
     global_cfg =
       if File.exists? CFG_GLOBAL_PATH
         File.open(CFG_GLOBAL_PATH, 'r') { |io| Config.load io }
+      else
+        Config.new
       end
 
     @config = 
