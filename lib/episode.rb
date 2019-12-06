@@ -23,10 +23,10 @@ class Episode
     end
 
     total = episodes.size
-    padding = Math.log10(config.index_from_zero ? total - 1 : total).floor + 1
+    padding = Math.log10(total + config.index_from - 1).floor + 1
 
     episodes.each_with_index do |filename, id|
-      id_fixed = config.index_from_zero ? id : id + 1
+      id_fixed = id + config.index_from
       id_formatted = id_fixed.to_s.rjust(padding, '0')
       separator = (config.last && id == last_id) ? config.pointer : '|'
       puts "#{id_formatted} #{separator} #{filename}"
@@ -34,7 +34,7 @@ class Episode
   end
 
   def status
-    puts "#{config.index_from_zero ? last_id : last_id + 1} #{config.pointer} #{config.last}"
+    puts "#{last_id + config.index_from} #{config.pointer} #{config.last}"
 
     unless config.last_played_at
       puts 'Time unknown'
@@ -88,11 +88,11 @@ class Episode
       rescue ArgumentError
         raise CommandError, <<~EOS
           Invalid value '#{n_str}'.
-          `no` command expects natural number.
+          `no` command expects a natural number.
         EOS
       end
-    config.last = episode_by_id(n - 1)
-    play
+    config.last = episode_by_id(n - config.index_from)
+    play_last
   end
 
   def cfg
@@ -214,19 +214,20 @@ class Episode
     case param
     when 'last'
       parse_episode_ref(value)
-    when 'index_from_zero'
-      unless %w[true false].include? value
+    when 'index_from'
+      begin
+        Integer(value)
+      rescue ArgumentError
         raise CommandError, <<~EOS
-          Invalid value '#{value}' for 'index_from_zero'.
-          Should be true or false.
+          Invalid value '#{value}' for 'index_from'.
+          Should be a natural number.
         EOS
       end
-      value == "true"
     when 'last_played_at'
       begin
         Time.parse value 
       rescue ArgumentError
-        raise CommandError, "Can't parse time"
+        raise CommandError, "Failed to parse time."
       end
     when 'pointer'
       "\"#{value}\"".undump
@@ -243,7 +244,7 @@ class Episode
       ref
     when ref =~ /^\d+$/
       ref_i = ref.to_i
-      id = config.index_from_zero ? ref_i : ref_i - 1
+      id = ref_i - config.index_from
       episode_by_id(id)
     else
       raise CommandError, "Can't parse episode reference '#{ref}'"
@@ -259,7 +260,7 @@ class Episode
       raise CommandError, <<~EOS
         Last episode is undefined.
         Please run:
-          `#{PROGRAM_NAME} #{config.index_from_zero ? 0 : 1}` or `ep next` -- to watch first episode
+          `#{PROGRAM_NAME} #{config.index_from}` or `ep next` -- to watch first episode
           `#{PROGRAM_NAME} set last <episode-number>` or `#{PROGRAM_NAME} set last <file-name>` -- to define where to start from
       EOS
     end

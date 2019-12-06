@@ -4,7 +4,7 @@ require 'time'
 class Episode
   DEFAULT_CFG = {
     viewer: 'mpv',
-    index_from_zero: false,
+    index_from: 1,
     pointer: '*',
     formats: %w[mkv mp4 avi]
   }
@@ -13,7 +13,7 @@ class Episode
 
   class Config
     attr_writer :viewer
-    attr_writer :index_from_zero
+    attr_writer :index_from
     attr_writer :pointer
     attr_writer :formats
 
@@ -34,7 +34,7 @@ class Episode
       end
 
       @viewer = opts[:viewer]
-      @index_from_zero = opts[:index_from_zero]
+      @index_from = opts[:index_from]
       @pointer = opts[:pointer]
       @formats = opts[:formats]
     end
@@ -47,7 +47,7 @@ class Episode
       if remove_defaults
         (@local || {}).merge({ 
           viewer: @viewer,
-          index_from_zero: @index_from_zero,
+          index_from: @index_from,
           pointer: @pointer,
           formats: @formats
         }).compact
@@ -60,7 +60,7 @@ class Episode
         
         (local_h || {}).merge({
           viewer: viewer,
-          index_from_zero: index_from_zero,
+          index_from: index_from,
           pointer: pointer,
           formats: formats
         })
@@ -103,8 +103,8 @@ class Episode
       @viewer || default(:viewer)
     end
 
-    def index_from_zero
-      @index_from_zero || default(:index_from_zero)
+    def index_from
+      @index_from || default(:index_from)
     end
 
     def pointer 
