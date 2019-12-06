@@ -3,6 +3,7 @@ require 'time'
 
 class Episode
   DEFAULT_CFG = {
+    dir: '.',
     viewer: 'mpv',
     index_from: 1,
     pointer: '*',

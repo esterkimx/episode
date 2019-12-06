@@ -22,19 +22,23 @@ class Episode
       raise CommandError, 'No episodes found in the directory'
     end
 
-    total = episodes.size
-    padding = Math.log10(total + config.index_from - 1).floor + 1
+    id_length = Math.log10(episodes.size + config.index_from - 1).floor + 1
 
     episodes.each_with_index do |filename, id|
       id_fixed = id + config.index_from
-      id_formatted = id_fixed.to_s.rjust(padding, '0')
-      separator = (config.last && id == last_id) ? config.pointer : '|'
+      id_formatted = id_fixed.to_s.rjust id_length, '0'
+      separator = 
+        if config.last && id_fixed == last_id
+          config.pointer
+        else
+          '|'
+        end
       puts "#{id_formatted} #{separator} #{filename}"
     end
   end
 
   def status
-    puts "#{last_id + config.index_from} #{config.pointer} #{config.last}"
+    puts "#{last_id} #{config.pointer} #{config.last}"
 
     unless config.last_played_at
       puts 'Time unknown'
@@ -68,7 +72,12 @@ class Episode
   alias l last
 
   def next
-    config.last = config.last ? episode_by_id(last_id + 1) : episodes.first
+    config.last = 
+      if config.last 
+        episode_by_id(last_id + 1) 
+      else 
+        episodes.first
+      end
     play_last
   end
 
@@ -91,12 +100,18 @@ class Episode
           `no` command expects a natural number.
         EOS
       end
-    config.last = episode_by_id(n - config.index_from)
+    config.last = episode_by_id n
     play_last
   end
 
   def cfg
-    cfg_h = global? ? config.global.to_h : config.to_h
+    cfg_h = 
+      if global? 
+        config.global.to_h
+      else
+        config.to_h
+      end
+
     cfg_h.each { |param, val| puts "#{param}: #{val}" }
   end
 
@@ -118,7 +133,7 @@ class Episode
       end
 
     cfg.send "#{param}=", parse_config_value(param, value)
-    safe_config_save(cfg_path, cfg)
+    safe_config_save cfg_path, cfg
   rescue NotLocal
     raise CommandError, "Parameter '#{param}' is not global"
   end
@@ -133,7 +148,7 @@ class Episode
       end
       $stderr.puts '[OK]'
     else
-      set(param, nil)
+      set param, nil
     end
   end
   
@@ -181,25 +196,58 @@ class Episode
 
   def episodes
     @episodes ||= 
-      Dir["./*{#{config.formats.join(',')}}"]
-        .select { |path| File.file? path }
-        .map { |path| File.basename(path) }
+      Dir.entries(config.dir)
+        .select { |path| path =~ /(#{config.formats.join '|'})$/ } 
         .sort
   end
 
   def episode_by_id(id)
-    ep = episodes[id] if id >= 0
-    ep || raise(CommandError, 'Episode not found') 
+    id_fixed = id - config.index_from
+    ep = episodes[id_fixed] if id_fixed >= 0
+    ep || raise(CommandError, "Episode ##{id} not found")
+  end
+
+  def last_id
+    config.index_from + episodes.find_index(last_name)
+  end
+
+  def last_name
+    @last_name ||= File.basename last_path 
+  end
+
+  def last_path
+    return @last_path if @last_path
+
+    unless config.last
+      raise CommandError, <<~EOS
+        Last episode is undefined.
+        Please run:
+          `#{PROGRAM_NAME} #{config.index_from}` or `ep next` -- to watch first episode
+          `#{PROGRAM_NAME} set last <episode-number>` or `#{PROGRAM_NAME} set last <file-name>` -- to define where to start from
+      EOS
+    end
+
+    path = File.join config.dir, config.last
+
+    if File.file? path
+      @last_path = path
+    else
+      raise CommandError, <<~EOS
+        '#{config.last}' doesn't exist.
+        To fix it run:
+          `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
+          `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
+      EOS
+    end
   end
 
   def play_last
     if name?
-      puts safe_config_last
+      puts last_name
     else
-      $stderr.puts "Viewing #{safe_config_last}"
-      filepath = File.join(config.dir || Dir.pwd, safe_config_last)
-      viewer_with_options = viewer.split(' ') 
-      system *viewer_with_options, filepath
+      $stderr.puts "Viewing #{last_id} #{config.pointer} #{last_name}"
+      viewer_with_options = viewer.split ' '
+      system *viewer_with_options, last_path
     end
 
     if update?
@@ -213,7 +261,7 @@ class Episode
 
     case param
     when 'last'
-      parse_episode_ref(value)
+      parse_episode_ref value
     when 'index_from'
       begin
         Integer(value)
@@ -251,34 +299,8 @@ class Episode
     end
   end
 
-  def last_id
-    episodes.find_index(safe_config_last)
-  end
-
-  def safe_config_last
-    unless config.last
-      raise CommandError, <<~EOS
-        Last episode is undefined.
-        Please run:
-          `#{PROGRAM_NAME} #{config.index_from}` or `ep next` -- to watch first episode
-          `#{PROGRAM_NAME} set last <episode-number>` or `#{PROGRAM_NAME} set last <file-name>` -- to define where to start from
-      EOS
-    end
-
-    unless File.file? config.last
-      raise CommandError, <<~EOS
-        '#{config.last}' doesn't exist.
-        To fix it run:
-          `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
-          `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
-      EOS
-    end
-
-    config.last
-  end
-
   def safe_config_save(path, cfg)
-    File.open(path, 'w') { |io| cfg.save(io) }
+    File.open(path, 'w') { |io| cfg.save io }
   rescue Errno::EACCES => e
     raise CommandError, <<~EOS
       Failed to save episode data.
