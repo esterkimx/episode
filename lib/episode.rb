@@ -62,21 +62,21 @@ class Episode
   alias s status
 
   def last
-    play 
+    play_last 
   end
 
   alias l last
 
   def next
     config.last = config.last ? episode_by_id(last_id + 1) : episodes.first
-    play 
+    play_last
   end
 
   alias n next
 
   def prev
     config.last = episode_by_id(last_id - 1)
-    play 
+    play_last
   end
 
   alias p prev
@@ -118,7 +118,7 @@ class Episode
       end
 
     cfg.send "#{param}=", parse_config_value(param, value)
-    config_save_safe(cfg_path, cfg)
+    safe_config_save(cfg_path, cfg)
   rescue NotLocal
     raise CommandError, "Parameter '#{param}' is not global"
   end
@@ -127,13 +127,16 @@ class Episode
     cfg_path = global? ? CFG_GLOBAL_PATH : CFG_FILENAME  
 
     if param.nil?
-      puts "Reset all config parameters (delete #{cfg_path})? (y|N)"
-      FileUtils.rm_f(cfg_path) if 'y' == $stdin.getch
+      $stderr.puts "Reset all config parameters (delete #{cfg_path})? (y|N)"
+      if 'y' == $stdin.getch && File.file?(cfg_path) 
+        safe_rm cfg_path 
+      end
+      $stderr.puts '[OK]'
     else
       set(param, nil)
     end
   end
-
+  
   alias r reset
 
   private
@@ -154,33 +157,34 @@ class Episode
     @is_global
   end
 
-  def config
-    return @config if @config
+  def viewer
+    @viewer || config.viewer
+  end
 
-    global_cfg =
+  def config
+    @config ||= 
+      if File.exists? CFG_FILENAME
+        File.open(CFG_FILENAME, 'r') { |io| Config.load io, global: config_global }
+      else
+        Config.new(global: config_global)
+      end
+  end
+
+  def config_global
+    @config_global ||= 
       if File.exists? CFG_GLOBAL_PATH
         File.open(CFG_GLOBAL_PATH, 'r') { |io| Config.load io }
       else
         Config.new
       end
-
-    @config = 
-      if File.exists? CFG_FILENAME
-        File.open(CFG_FILENAME, 'r') { |io| Config.load io, global: global_cfg }
-      else
-        Config.new(global: global_cfg)
-      end
-  end
-
-  def viewer
-    @viewer || config.viewer
   end
 
   def episodes
     @episodes ||= 
       Dir["./*{#{config.formats.join(',')}}"]
         .select { |path| File.file? path }
-        .map { |path| File.basename(path) }.sort
+        .map { |path| File.basename(path) }
+        .sort
   end
 
   def episode_by_id(id)
@@ -188,56 +192,19 @@ class Episode
     ep || raise(CommandError, 'Episode not found') 
   end
 
-  def parse_episode_ref(ref)
-    case
-    when File.file?(ref)
-      ref
-    when ref =~ /^\d+$/
-      ref_i = ref.to_i
-      id = config.index_from_zero ? ref_i : ref_i - 1
-      episode_by_id(id)
-    else
-      raise CommandError, "Can't parse episode reference '#{ref}'"
-    end
-  end
-
-  def last_safe
-    unless config.last
-      raise CommandError, <<~EOS
-        Last episode is undefined.
-        Please run:
-          `#{PROGRAM_NAME} #{config.index_from_zero ? 0 : 1}` or `ep next` -- to watch first episode
-          `#{PROGRAM_NAME} set last <episode-number>` or `#{PROGRAM_NAME} set last <file-name>` -- to define where to start from
-      EOS
-    end
-
-    unless File.file? config.last
-      raise CommandError, <<~EOS
-        '#{config.last}' doesn't exist.
-        To fix it run:
-          `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
-          `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
-      EOS
-    end
-
-    config.last
-  end
-
-  def last_id
-    @last_id ||= episodes.find_index(last_safe)
-  end
-
-  def play
+  def play_last
     if name?
-      puts last_safe
+      puts safe_config_last
     else
-      $stderr.puts "Viewing #{last_safe}"
-      system(*viewer.split(' '), File.join(config.dir, last_safe))
+      $stderr.puts "Viewing #{safe_config_last}"
+      filepath = File.join(config.dir || Dir.pwd, safe_config_last)
+      viewer_with_options = viewer.split(' ') 
+      system *viewer_with_options, filepath
     end
 
     if update?
       config.last_played_at = Time.now
-      config_save_safe(CFG_FILENAME, config)
+      safe_config_save CFG_FILENAME, config
     end
   end
 
@@ -270,11 +237,62 @@ class Episode
     end
   end
 
-  def config_save_safe(path, cfg)
+  def parse_episode_ref(ref)
+    case
+    when File.file?(ref)
+      ref
+    when ref =~ /^\d+$/
+      ref_i = ref.to_i
+      id = config.index_from_zero ? ref_i : ref_i - 1
+      episode_by_id(id)
+    else
+      raise CommandError, "Can't parse episode reference '#{ref}'"
+    end
+  end
+
+  def last_id
+    episodes.find_index(safe_config_last)
+  end
+
+  def safe_config_last
+    unless config.last
+      raise CommandError, <<~EOS
+        Last episode is undefined.
+        Please run:
+          `#{PROGRAM_NAME} #{config.index_from_zero ? 0 : 1}` or `ep next` -- to watch first episode
+          `#{PROGRAM_NAME} set last <episode-number>` or `#{PROGRAM_NAME} set last <file-name>` -- to define where to start from
+      EOS
+    end
+
+    unless File.file? config.last
+      raise CommandError, <<~EOS
+        '#{config.last}' doesn't exist.
+        To fix it run:
+          `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
+          `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
+      EOS
+    end
+
+    config.last
+  end
+
+  def safe_config_save(path, cfg)
     File.open(path, 'w') { |io| cfg.save(io) }
-  rescue Errno::EACCES
+  rescue Errno::EACCES => e
     raise CommandError, <<~EOS
-      Failed to save the episode data: can't write to this directory.
+      Failed to save episode data.
+      #{e.message}
+      [ERROR]
+    EOS
+  end
+
+  def safe_rm(path)
+    $stderr.puts "rm #{path}"
+    FileUtils.rm path
+  rescue Errno::EACCES => e
+    raise CommandError, <<~EOS
+      #{e.message}
+      [ERROR]
     EOS
   end
 end

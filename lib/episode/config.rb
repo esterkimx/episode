@@ -76,7 +76,7 @@ class Episode
     end
 
     def dir
-      get_local(:dir) { Dir.pwd }
+      get_local :dir
     end
 
     def dir=(new_val)
