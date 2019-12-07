@@ -124,6 +124,11 @@ class Episode
       end
 
     cfg.send "#{param}=", parse_config_value(param, value)
+
+    if param == 'last'
+      cfg.last_played_at = nil
+    end
+
     safe_config_save cfg_path, cfg
   rescue NotLocal
     raise CommandError, "Parameter '#{param}' is not global"
