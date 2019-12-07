@@ -24,17 +24,17 @@ opt_parser =
           ep set viewer vlc -g      use VLC as default video player (by default it's mpv)
 
         Commands:
-              ls                    List all episodes and their idnexes
-          (s) status                Show information about last view
-          (l) last                  Re-play episode watched last time 
-          (n) next                  Play next episode
-          (p) prev                  Play previous episode (one before 'last') 
-              <number>              Same as `#{PROGRAM_NAME} no <number>` (i.e. `#{PROGRAM_NAME} 11`)
-              no <number>           Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
-          (c) cfg                   Display config for the current directory
-              set <param> <value>   Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
-          (r) reset [param]         Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
-          (h) help                  Show this help
+              ls                      List all episodes and their idnexes
+          (s) status                  Show information about last view
+          (l) last                    Re-play episode watched last time 
+          (n) next                    Play next episode
+          (p) prev                    Play previous episode (one before 'last') 
+              <number-or-file>        Same as `#{PROGRAM_NAME} play <number-or-file>` (i.e. `#{PROGRAM_NAME} 11`)
+              play <number-or-file>   Play episode by number (i.e. `#{PROGRAM_NAME} no 11`) 
+          (c) cfg                     Display config for the current directory
+              set <param> <value>     Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
+          (r) reset [param]           Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
+          (h) help                    Show this help
     EOS
       
     opts.separator("\n  Options for `last`, `next`, `prev`, and `no`:")
@@ -68,9 +68,6 @@ begin
   when %w[h help].include?(ARGV[0])
     $stderr.puts opt_parser.help
     return
-  when ARGV[0] =~ /^\d+$/
-    command = 'no'
-    args = [ARGV[0]]
   else
     command = ARGV[0]
     args = ARGV[1..]

@@ -90,17 +90,8 @@ class Episode
 
   alias p prev
 
-  def no(n_str)
-    n =
-      begin
-        Integer(n_str.gsub /^0*(\d)/, '\\1') 
-      rescue ArgumentError
-        raise CommandError, <<~EOS
-          Invalid value '#{n_str}'.
-          `no` command expects a natural number.
-        EOS
-      end
-    config.last = episode_by_id n
+  def play(ref)
+    config.last = parse_episode_ref ref
     play_last
   end
 
@@ -157,7 +148,11 @@ class Episode
   private
 
   def method_missing(*args)
-    raise NoCommandError, args.first
+    if args.size == 1
+      play args.first.to_s
+    else
+      raise NoCommandError, args.first
+    end
   end
 
   def name?
@@ -261,14 +256,11 @@ class Episode
     when 'last'
       parse_episode_ref value
     when 'index_from'
-      begin
-        Integer(value)
-      rescue ArgumentError
-        raise CommandError, <<~EOS
+      parse_natural_number value, 
+        err_msg: <<~EOS
           Invalid value '#{value}' for 'index_from'.
           Should be a natural number.
         EOS
-      end
     when 'last_played_at'
       begin
         Time.parse value 
@@ -289,11 +281,27 @@ class Episode
     when File.file?(ref)
       ref
     when ref =~ /^\d+$/
-      ref_i = ref.to_i
-      id = ref_i - config.index_from
-      episode_by_id(id)
+      id = parse_natural_number ref,
+        err_msg: <<~EOS
+          Can't parse #{ref}.
+          Should be a file or a natural number.
+        EOS
+      episode_by_id id
     else
-      raise CommandError, "Can't parse episode reference '#{ref}'"
+      raise CommandError, "File '#{ref}' not found"
+    end
+  end
+
+  def parse_natural_number(str, err_msg: nil)
+      Integer(str.gsub /^0*(\d)/, '\\1') 
+  rescue ArgumentError 
+    if err_msg
+      raise CommandError, err_msg
+    else
+      raise CommandError, <<~EOS
+        Invalid value '#{str}'.
+        Should be a natural number.
+      EOS
     end
   end
 
