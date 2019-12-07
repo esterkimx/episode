@@ -51,13 +51,13 @@ class Episode
     minutes_ago = (seconds_ago % 3600) / 60
     time_passed = 
       if seconds_ago < 60
-        "#{seconds_ago} second#{seconds_ago == 1 ? '' : 's'}" 
+        pluralize seconds_ago, 'second'
       else
         [
-          days_ago > 0 ? "#{days_ago} day#{days_ago == 1 ? '' : 's'}" : nil,
-          hours_ago > 0 ? "#{hours_ago} hour#{hours_ago == 1 ? '' : 's'}" : nil,
-          minutes_ago > 0 ? "#{minutes_ago} minute#{minutes_ago == 1 ? '' : 's'}" : nil
-        ].compact.join(" ")
+          days_ago > 0 ? pluralize(days_ago, 'day') : nil,
+          hours_ago > 0 ? pluralize(hours_ago, 'hour') : nil,
+          minutes_ago > 0 ? pluralize(minutes_ago, 'minute') : nil
+        ].compact.join ' '
       end
       
     puts "#{config.last_played_at} (#{time_passed} ago)" 
@@ -212,12 +212,10 @@ class Episode
   end
 
   def last_name
-    @last_name ||= File.basename last_path 
+    File.basename last_path 
   end
 
   def last_path
-    return @last_path if @last_path
-
     unless config.last
       raise CommandError, <<~EOS
         Last episode is undefined.
@@ -230,7 +228,7 @@ class Episode
     path = File.join config.dir, config.last
 
     if File.file? path
-      @last_path = path
+      path
     else
       raise CommandError, <<~EOS
         '#{config.last}' doesn't exist.
@@ -245,7 +243,7 @@ class Episode
     if name?
       puts last_name
     else
-      $stderr.puts "Viewing #{last_id} #{config.pointer} #{last_name}"
+      $stderr.puts "Viewing ##{last_id} #{config.pointer} #{last_name}"
       viewer_with_options = viewer.split ' '
       system *viewer_with_options, last_path
     end
@@ -317,5 +315,9 @@ class Episode
       #{e.message}
       [ERROR]
     EOS
+  end
+
+  def pluralize(n, word)
+    "#{n} #{word}#{n == 1 ? '' : 's'}" 
   end
 end
