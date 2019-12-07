@@ -48,34 +48,33 @@ ep cfg -g
 
 ## Usage (`ep help`)
 ```
-Usage: ep <command> [options] 
+Usage: ep <command> [options]  
 
   Quick start:
-    ep ls                     show episodes in the current directory with their indexes
-    ep                        same as `ep ls`
-    ep 7                      play episode #7
-    ep next                   play next episode (or first)
-    ep set viewer vlc -g      use VLC as default video player (by default it's mpv)
+    ep ls                            Show episodes in the current directory with their numbers
+    ep                               Same as `ep ls`
+    ep 7                             Play episode #7
+    ep next                          Play next episode (or first)
+    ep set viewer vlc -g             Use VLC as default video player (by default it's mpv)
 
   Commands:
-        ls                    List all episodes and their idnexes
-    (s) status                Show information about last view
-    (l) last                  Re-play episode watched last time 
-    (n) next                  Play next episode
-    (p) prev                  Play previous episode (one before 'last') 
-        <number>              Same as `ep no <number>` (i.e. `ep 11`)
-        no <number>           Play episode by number (i.e. `ep no 11`) 
-    (c) cfg                   Display config for the current directory
-        set <param> <value>   Set config parameter (i.e. `ep set last 11`)
-    (r) reset [param]         Reset config parameter (i.e. `ep reset last`)
-    (h) help                  Show this help
+        ls                           List all episodes and their numbers
+        <number-or-file>             Same as `ep play <number-or-file>` (i.e. `ep 11`)
+        play <number-or-file>        Play episode (i.e. `ep play 11`) 
+    (s) status                       Show information about last view
+    (l) last                         Re-play episode watched last time 
+    (n) next                         Play next episode
+    (p) prev                         Play previous episode (one before 'last') 
+    (c) cfg                          Show config
+        set <param> <value>          Set config parameter (i.e. `ep set last 11`)
+    (r) reset [param]                Reset config parameter (i.e. `ep reset last`)
 
-  Options for `last`, `next`, `prev`, and `no`:
+  Options for `play`, `last`, `next`, and `prev`:
     -n, --name                       Show episode name, but don't play it (i.e. `ep -n 11`)
     -o, --no-update                  Don't update .episode file
-    -v, --viewer <program>           Set viewer
+    -v, --viewer <program>           Specify what viewer to use (i.e. `ep 7 -v vlc`)
 
-  Options for `cfg`, `set` and `reset`:
+  Options for `cfg`, `set`, and `reset`:
     -g, --global                     Edit (or show) global config ($HOME/.config/episode)
 ```
 
