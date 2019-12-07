@@ -9,6 +9,7 @@ CFG_GLOBAL_DIR = ENV['XDG_CONFIG_HOME'] || File.join(ENV['HOME'], '.config')
 CFG_GLOBAL_PATH = File.join(CFG_GLOBAL_DIR, 'episode')
 
 options = {}
+
 opt_parser = 
   OptionParser.new do |opts|
     opts.program_name = 'episode'
@@ -34,7 +35,6 @@ opt_parser =
           (c) cfg                     Display config for the current directory
               set <param> <value>     Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
           (r) reset [param]           Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
-          (h) help                    Show this help
     EOS
       
     opts.separator("\n  Options for `last`, `next`, `prev`, and `no`:")
@@ -60,19 +60,8 @@ opt_parser =
 
 begin
   opt_parser.parse!
-
-  case
-  when ARGV[0].nil?
-    command = 'ls'
-    args = []
-  when %w[h help].include?(ARGV[0])
-    $stderr.puts opt_parser.help
-    return
-  else
-    command = ARGV[0]
-    args = ARGV[1..]
-  end
-
+  command = ARGV[0] || 'ls'
+  args = ARGV[1..]
   Episode.new(options).public_send(command, *args)
 rescue OptionParser::ParseError => e
   $stderr.puts <<~EOS
