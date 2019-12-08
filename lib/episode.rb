@@ -145,10 +145,9 @@ class Episode
 
     if param.nil?
       $stderr.puts "Reset all config parameters (delete #{cfg_path})? (y|N)"
-      if 'y' == $stdin.getch && File.file?(cfg_path) 
+      if 'y' == $stdin.getch
         safe_rm cfg_path 
       end
-      $stderr.puts '[OK]'
     else
       set param, nil
     end
@@ -329,10 +328,14 @@ class Episode
   def safe_rm(path)
     $stderr.puts "rm #{path}"
     FileUtils.rm path
+  rescue Errno::ENOENT => e
+    raise CommandError, <<~EOS
+      File #{path} doesn't exist.
+    EOS
   rescue Errno::EACCES => e
     raise CommandError, <<~EOS
+      Failed to remove file #{path}
       #{e.message}
-      [ERROR]
     EOS
   end
 
