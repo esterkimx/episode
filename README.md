@@ -26,14 +26,14 @@ Watch episode #7
 ep 7
 ```
 
-Watch with VLC
+Watch with mpv
 ```
-ep 7 -v vlc
+ep 7 -v mpv
 ``` 
 
-Make VLC default player for this directory (add `-g` to make it global)
+Make mpv default player for this directory (add `-g` to make it global)
 ```
-ep set viewer vlc
+ep set viewer mpv
 ```
 
 Show config for the current directory
@@ -119,3 +119,19 @@ ep set viewer 'hexdump -C'
 # Invoking:
 ep next | less
 ```
+
+#### Viewing files from read-only directories
+Since `episode` creates an `.episode` file with local configuration in the directory, you can't use it in read-only directories.
+However, we can work around this limitation with `dir` parameter. 
+
+First, create a new directory
+```
+mkdir placeholder && cd placeholder
+```
+
+Then set parameter 'dir' to point to the target directory
+```
+ep set dir /path/to/readonly/directory
+```
+
+This way `episode` will list and track files from `/path/to/readonly/directory` instead of `placeholder` directory.
