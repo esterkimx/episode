@@ -122,14 +122,14 @@ ep next | less
 
 #### Viewing files from read-only directories
 Since `episode` creates an `.episode` file with local configuration in the directory, you can't use it in read-only directories.
-However, we can work around this limitation with `dir` parameter. 
+However, we can work around this limitation by changing `dir` parameter. 
 
 First, create a new directory
 ```
 mkdir placeholder && cd placeholder
 ```
 
-Then set parameter 'dir' to point to the target directory
+Then set parameter `dir` to point to the target directory
 ```
 ep set dir /path/to/readonly/directory
 ```
