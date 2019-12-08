@@ -321,7 +321,6 @@ class Episode
     raise CommandError, <<~EOS
       Failed to save episode data.
       #{e.message}
-      [ERROR]
     EOS
   end
 
