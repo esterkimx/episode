@@ -28,7 +28,8 @@ class Episode
       EOS
     end
 
-    id_length = Math.log10(episodes.size + config.index_from - 1).floor + 1
+    largest_id = episodes.size - 1 + config.index_from
+    id_length = Math.log10([largest_id, 1].max).floor + 1
 
     episodes.each_with_index do |filename, id|
       id_fixed = id + config.index_from
