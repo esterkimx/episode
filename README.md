@@ -39,7 +39,7 @@ ep set viewer mpv
 Show config for the current directory
 ```
 ep cfg
-```- 1
+```
 
 Show global config
 ```
