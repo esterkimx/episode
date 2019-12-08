@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
         'episode.gemspec'
     ]
 
-    s.required_ruby_version = '>= 2.3.0'
+    s.required_ruby_version = '>= 2.5.0'
     s.bindir = 'bin'
     s.executables = ['ep']
 

@@ -3,6 +3,7 @@ Remembers what file in the directory you viewed last time.
 Enumerates all files in the directory and allows to reference them only by a number.
 
 ## Installation
+Requires Ruby >= 2.5.0.
 
 #### Using `gem`
 ```
@@ -10,7 +11,7 @@ gem install episode
 ```
 
 #### Manual
-Clone this repository and add `bin/ep` to your `$PATH`.
+Clone this repository and add `episode/bin` to your `$PATH`.
 
 ## Quick Start
 

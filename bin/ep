@@ -61,7 +61,7 @@ opt_parser =
 begin
   opt_parser.parse!
   command = ARGV[0] || 'ls'
-  args = ARGV[1..]
+  args = ARGV[1..-1]
   Episode.new(options).public_send(command, *args)
 rescue OptionParser::ParseError => e
   $stderr.puts <<~EOS
