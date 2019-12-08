@@ -46,7 +46,7 @@ Show global config
 ep cfg -g
 ```
 
-## Usage (`ep help`)
+## Usage (`ep -h`)
 ```
 Usage: ep <command> [options]  
  
