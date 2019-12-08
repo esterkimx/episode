@@ -26,6 +26,11 @@ Watch episode #7
 ep 7
 ```
 
+Watch next episode
+```
+ep next
+```
+
 Watch with mpv
 ```
 ep 7 -v mpv
