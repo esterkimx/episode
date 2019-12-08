@@ -14,7 +14,7 @@ Clone this repository and add `bin/ep` to your `$PATH`.
 
 ## Quick Start
 
-Episode creates `.episode` file in the current directory when you open some file with it. By default it will be looking for `mkv`, `avi` or `mp4` files and will use `mpv` as the viewer. Read [examples](#viewing-different-file-formats) below to see how to change this behavior.
+Episode creates `.episode` file in the current directory when you open some file with it. By default it will be looking for `mkv`, `avi` or `mp4` files and will use `xdg-open` as the viewer. Read [examples](#viewing-different-file-formats) below to see how to change this behavior.
 
 List episodes in the current directory.
 ```
@@ -39,7 +39,7 @@ ep set viewer mpv
 Show config for the current directory
 ```
 ep cfg
-```
+```- 1
 
 Show global config
 ```
