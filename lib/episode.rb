@@ -4,8 +4,8 @@ require 'io/console'
 require_relative 'episode/config'
 
 class Episode
-  VERSION = 1
-  VERSION_PATCH = 1
+  VERSION = 2
+  VERSION_PATCH = 0
 
   class NoCommandError < StandardError; end
   class CommandError < StandardError; end
