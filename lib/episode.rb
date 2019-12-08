@@ -10,7 +10,7 @@ class Episode
   class NoCommandError < StandardError; end
   class CommandError < StandardError; end
 
-  def initialize(opts) 
+  def initialize(opts = {}) 
     @is_name = opts[:name] || false
     @is_update = opts[:update] != false
     @is_global = opts[:global] || false
@@ -129,7 +129,7 @@ class Episode
       cfg.last_played_at = nil
     end
 
-    safe_config_save cfg_path, cfg
+    config_save cfg_path, cfg
   rescue NotLocal
     raise CommandError, "Parameter '#{param}' is not global"
   end
@@ -221,7 +221,7 @@ class Episode
         Last episode is undefined.
         Please run:
           `#{PROGRAM_NAME} #{config.index_from}` or `ep next` -- to watch first episode
-          `#{PROGRAM_NAME} set last <episode-number>` or `#{PROGRAM_NAME} set last <file-name>` -- to define where to start from
+          `#{PROGRAM_NAME} set last <number-or-file>` -- to define where to start from
       EOS
     end
 
@@ -232,9 +232,9 @@ class Episode
     else
       raise CommandError, <<~EOS
         '#{config.last}' doesn't exist.
-        To fix it run:
-          `#{PROGRAM_NAME} set last <file-name>` or `#{PROGRAM_NAME} set last <episode-number>` -- to define last file
-          `#{PROGRAM_NAME} reset last` -- to erase erroneous value 
+        It looks like '.episode' file is damaged. To fix it run:
+          `#{PROGRAM_NAME} set last <numer-or-file>` -- to define last file
+          `#{PROGRAM_NAME} reset last` -- to reset erroneous value 
       EOS
     end
   end
@@ -250,7 +250,7 @@ class Episode
 
     if update?
       config.last_played_at = Time.now
-      safe_config_save CFG_FILENAME, config
+      config_save CFG_FILENAME, config
     end
   end
 
@@ -310,7 +310,7 @@ class Episode
     end
   end
 
-  def safe_config_save(path, cfg)
+  def config_save(path, cfg)
     File.open(path, 'w') { |io| cfg.save io }
   rescue Errno::EACCES => e
     raise CommandError, <<~EOS

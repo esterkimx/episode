@@ -49,13 +49,13 @@ ep cfg -g
 ## Usage (`ep help`)
 ```
 Usage: ep <command> [options]  
-
+ 
   Quick start:
     ep ls                            Show episodes in the current directory with their numbers
     ep                               Same as `ep ls`
     ep 7                             Play episode #7
     ep next                          Play next episode (or first)
-    ep set viewer vlc -g             Use VLC as default video player (by default it's mpv)
+    ep set viewer mpv -g             Use mpv as default video player (by default it's xdg-open)
 
   Commands:
         ls                           List all episodes and their numbers
@@ -72,7 +72,8 @@ Usage: ep <command> [options]
   Options for `play`, `last`, `next`, and `prev`:
     -n, --name                       Show episode name, but don't play it (i.e. `ep -n 11`)
     -o, --no-update                  Don't update .episode file
-    -v, --viewer <program>           Specify what viewer to use (i.e. `ep 7 -v vlc`)
+    -v, --viewer <program>           Specify what viewer to use (i.e. `ep 7 -v mpv`)
+
 
   Options for `cfg`, `set`, and `reset`:
     -g, --global                     Edit (or show) global config ($HOME/.config/episode)

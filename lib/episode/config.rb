@@ -4,7 +4,7 @@ require 'time'
 class Episode
   DEFAULT_CFG = {
     dir: '.',
-    viewer: 'mpv',
+    viewer: 'xdg-open',
     index_from: 1,
     pointer: '*',
     formats: %w[mkv mp4 avi]
