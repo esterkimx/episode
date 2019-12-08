@@ -55,7 +55,7 @@ Usage: ep <command> [options]
     ep                               Same as `ep ls`
     ep 7                             Play episode #7
     ep next                          Play next episode (or first)
-    ep set viewer mpv -g             Use mpv as default video player (by default it's xdg-open)
+    ep set viewer mpv -g             Use mpv as default file viewer (by default it's xdg-open)
 
   Commands:
         ls                           List all episodes and their numbers
