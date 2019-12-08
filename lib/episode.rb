@@ -19,7 +19,13 @@ class Episode
 
   def ls
     if episodes.empty?
-      raise CommandError, 'No episodes found in the directory'
+      raise CommandError, <<~EOS 
+        No episodes found in the directory.
+        Currently #{PROGRAM_NAME} is looking for the following formats: #{config.formats.join ', '}.
+        To change this run:
+          `ep set formats fmt1,fmt2,fmt3` -- to set list of formats for the current directory
+          `ep set formats fmt1,fmt2,fmt3 -g` -- to make it global
+      EOS
     end
 
     id_length = Math.log10(episodes.size + config.index_from - 1).floor + 1
