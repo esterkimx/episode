@@ -65,20 +65,20 @@ Usage: ep <command> [options]
 
   Commands:
         ls                           List all episodes and their numbers
-        <number-or-file>             Same as `ep play <number-or-file>` (i.e. `ep 11`)
-        play <number-or-file>        Play episode (i.e. `ep play 11`) 
+        <number-or-file>             Same as `ep play <number-or-file>` (e.g. `ep 11`)
+        play <number-or-file>        Play episode (e.g. `ep play 11`) 
     (s) status                       Show information about last view
     (l) last                         Re-play episode watched last time 
     (n) next                         Play next episode
     (p) prev                         Play previous episode (one before 'last') 
     (c) cfg                          Show config
-        set <param> <value>          Set config parameter (i.e. `ep set last 11`)
-    (r) reset [param]                Reset config parameter (i.e. `ep reset last`)
+        set <param> <value>          Set config parameter (e.g. `ep set last 11`)
+    (r) reset [param]                Reset config parameter (e.g. `ep reset last`)
 
   Options for `play`, `last`, `next`, and `prev`:
-    -n, --name                       Show episode name, but don't play it (i.e. `ep -n 11`)
+    -n, --name                       Show episode name, but don't play it (e.g. `ep -n 11`)
     -o, --no-update                  Don't update .episode file
-    -v, --viewer <program>           Specify what viewer to use (i.e. `ep 7 -v mpv`)
+    -v, --viewer <program>           Specify what viewer to use (e.g. `ep 7 -v mpv`)
 
 
   Options for `cfg`, `set`, and `reset`:

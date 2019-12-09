@@ -26,20 +26,20 @@ opt_parser =
 
         Commands:
               ls                           List all episodes and their numbers
-              <number-or-file>             Same as `#{PROGRAM_NAME} play <number-or-file>` (i.e. `#{PROGRAM_NAME} 11`)
-              play <number-or-file>        Play episode (i.e. `#{PROGRAM_NAME} play 11`) 
+              <number-or-file>             Same as `#{PROGRAM_NAME} play <number-or-file>` (e.g. `#{PROGRAM_NAME} 11`)
+              play <number-or-file>        Play episode (e.g. `#{PROGRAM_NAME} play 11`) 
           (s) status                       Show information about last view
           (l) last                         Re-play episode watched last time 
           (n) next                         Play next episode
           (p) prev                         Play previous episode (one before 'last') 
           (c) cfg                          Show config
-              set <param> <value>          Set config parameter (i.e. `#{PROGRAM_NAME} set last 11`)
-          (r) reset [param]                Reset config parameter (i.e. `#{PROGRAM_NAME} reset last`)
+              set <param> <value>          Set config parameter (e.g. `#{PROGRAM_NAME} set last 11`)
+          (r) reset [param]                Reset config parameter (e.g. `#{PROGRAM_NAME} reset last`)
     EOS
       
     opts.separator("\n  Options for `play`, `last`, `next`, and `prev`:")
 
-    opts.on('-n', '--name', "Show episode name, but don't play it (i.e. `#{PROGRAM_NAME} -n 11`)") do
+    opts.on('-n', '--name', "Show episode name, but don't play it (e.g. `#{PROGRAM_NAME} -n 11`)") do
       options[:name] = true
     end
     
@@ -47,7 +47,7 @@ opt_parser =
       options[:update] = false
     end
 
-    opts.on('-v', '--viewer <program>', "Specify what viewer to use (i.e. `#{PROGRAM_NAME} 7 -v mpv`)") do |viewer|
+    opts.on('-v', '--viewer <program>', "Specify what viewer to use (e.g. `#{PROGRAM_NAME} 7 -v mpv`)") do |viewer|
       options[:viewer] = viewer
     end
 
