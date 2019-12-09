@@ -2,17 +2,17 @@ require 'json'
 require 'time'
 
 class Episode
-  DEFAULT_CFG = {
-    dir: '.',
-    viewer: 'xdg-open',
-    index_from: 1,
-    pointer: '*',
-    formats: %w[mkv mp4 avi]
-  }
-
   class NotLocal < StandardError; end
 
   class Config
+    DEFAULT = {
+      dir: '.',
+      viewer: 'xdg-open',
+      index_from: 1,
+      pointer: '*',
+      formats: %w[mkv mp4 avi]
+    }
+
     attr_writer :viewer
     attr_writer :index_from
     attr_writer :pointer
@@ -128,7 +128,7 @@ class Episode
     end
 
     def default(param) 
-      @global_cfg&.public_send(param) || DEFAULT_CFG[param]
+      @global_cfg&.public_send(param) || DEFAULT[param]
     end
   end
 end
